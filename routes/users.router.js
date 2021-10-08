@@ -1,18 +1,21 @@
 const express = require("express");
+const usersService = require("./../services/users.service");
 
 const router = express.Router();
+const service = new usersService();
 
 router.get("/", (req, res) => {
-  const { limit, offset } = req.query;
+  const users = service.find();
 
-  if (limit && offset) {
-    res.status(200).json({
-      limit,
-      offset
-    });
-  } else {
-    res.send("no hay parametros");
-  }
+  res.json(users);
+});
+
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+
+  const user = service.findOne(id);
+
+  res.json(user);
 });
 
 router.post("/", (req, res) => {
@@ -25,34 +28,47 @@ router.post("/", (req, res) => {
 });
 
 router.patch("/:id", (req, res) => {
-  const body = req.body;
-  const { id } = req.params;
+  try {
+    const body = req.body;
+    const { id } = req.params;
 
-  res.status(204).json({
-    message: "updated patch",
-    data: body,
-    id
-  });
+    const userUpdate = service.update(id, body);
+
+    res.json(userUpdate);
+  } catch (error) {
+    res.status(404).json({
+      message: error.message
+    });
+  }
 });
 
 router.put("/:id", (req, res) => {
-  const body = req.body;
-  const { id } = req.params;
+  try {
+    const body = req.body;
+    const { id } = req.params;
 
-  res.status(204).json({
-    message: "updated",
-    data: body,
-    id
-  });
+    const userUpdate = service.update(id, body);
+
+    res.json(userUpdate);
+  } catch (error) {
+    res.status(404).json({
+      message: error.message
+    });
+  }
 });
 
 router.delete("/:id", (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  res.status(202).json({
-    message: "deleted",
-    id
-  });
+    const deleteProduct = service.delete(id);
+
+    res.status(202).json(deleteProduct);
+  } catch (error) {
+    res.status(404).json({
+      message: error.message
+    });
+  }
 });
 
 module.exports = router;
