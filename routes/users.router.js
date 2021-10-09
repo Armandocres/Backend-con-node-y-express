@@ -10,12 +10,16 @@ router.get("/", (req, res) => {
   res.json(users);
 });
 
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
+router.get("/:id", (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  const user = service.findOne(id);
+    const user = service.findOne(id);
 
-  res.json(user);
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.post("/", (req, res) => {
@@ -27,7 +31,7 @@ router.post("/", (req, res) => {
   });
 });
 
-router.patch("/:id", (req, res) => {
+router.patch("/:id", (req, res, next) => {
   try {
     const body = req.body;
     const { id } = req.params;
@@ -36,9 +40,7 @@ router.patch("/:id", (req, res) => {
 
     res.json(userUpdate);
   } catch (error) {
-    res.status(404).json({
-      message: error.message
-    });
+    next(error);
   }
 });
 

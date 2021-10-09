@@ -1,4 +1,5 @@
 const faker = require("faker");
+const boom = require("@hapi/boom");
 
 class categoriesService {
   constructor() {
@@ -13,7 +14,8 @@ class categoriesService {
       this.categories.push({
         id: faker.datatype.uuid(),
         name: faker.commerce.productName(),
-        image: faker.image.imageUrl()
+        image: faker.image.imageUrl(),
+        isBlock: faker.datatype.boolean()
       });
     }
   }
@@ -32,14 +34,24 @@ class categoriesService {
   }
 
   findOne(id) {
-    return this.categories.find((item) => item.id === id);
+    const categorie = this.categories.find((item) => item.id === id);
+
+    if (!categorie) {
+      throw boom.notFound("Product not found");
+    }
+
+    if (categorie.isBlock) {
+      throw boom.conflict("Categoria block");
+    }
+
+    return categorie;
   }
 
   update(id, changes) {
     const index = this.categories.findIndex((item) => item.id === id);
 
     if (index === -1) {
-      throw new Error("product nor found");
+      throw boom.notFound("Product not found");
     }
 
     const categoria = this.categories[index];
@@ -55,7 +67,7 @@ class categoriesService {
     const index = this.categories.findIndex((item) => item.id === id);
 
     if (index === -1) {
-      throw new Error("product nor found");
+      throw boom.notFound("Product not found");
     }
 
     this.categories.splice(index, 1);

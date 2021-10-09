@@ -10,12 +10,16 @@ router.get("/", (req, res) => {
   res.json(categories);
 });
 
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
+router.get("/:id", (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  const categorie = service.findOne(id);
+    const categorie = service.findOne(id);
 
-  res.json(categorie);
+    res.json(categorie);
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.post("/", (req, res) => {
@@ -28,7 +32,7 @@ router.post("/", (req, res) => {
   });
 });
 
-router.patch("/:id", (req, res) => {
+router.patch("/:id", (req, res, next) => {
   try {
     const body = req.body;
     const { id } = req.params;
@@ -37,9 +41,7 @@ router.patch("/:id", (req, res) => {
 
     res.json(updateCategorie);
   } catch (error) {
-    res.status(404).json({
-      message: error.message
-    });
+    next(error);
   }
 });
 
